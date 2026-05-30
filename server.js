@@ -8,7 +8,12 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Resend wird erst beim ersten Request initialisiert
+let resend;
+function getResend() {
+  if (!resend) resend = new Resend(process.env.RESEND_API_KEY);
+  return resend;
+}
 
 const submitLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 Stunde
@@ -94,7 +99,7 @@ app.post('/api/submit', submitLimiter, async (req, res) => {
   });
 
   try {
-    const { error } = await resend.emails.send({
+    const { error } = await getResend().emails.send({
       from: 'KFZ Schadenformular <onboarding@resend.dev>',
       to: process.env.RITA_EMAIL,
       replyTo: personal.email,
