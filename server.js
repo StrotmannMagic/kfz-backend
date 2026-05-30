@@ -1,19 +1,11 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const { Resend } = require('resend');
 const rateLimit = require('express-rate-limit');
 
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
-
-// Resend wird erst beim ersten Request initialisiert
-let resend;
-function getResend() {
-  if (!resend) resend = new Resend(process.env.RESEND_API_KEY);
-  return resend;
-}
 
 const submitLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 Stunde
@@ -31,9 +23,7 @@ app.post('/api/submit', submitLimiter, async (req, res) => {
     return res.status(400).json({ success: false, message: 'Ungültige Anfrage.' });
   }
 
-  const {
-    personal, fahrzeug, versicherung, unfall, gegner, schaden
-  } = formData;
+  const { personal, fahrzeug, versicherung, unfall, gegner, schaden } = formData;
 
   const htmlBody = `
     <h2 style="color:#1a56db;">🚗 Neuer KFZ-Schadensfall eingegangen</h2>
@@ -93,24 +83,36 @@ app.post('/api/submit', submitLimiter, async (req, res) => {
     const mimeType = meta.match(/:(.*?);/)[1];
     const ext = mimeType.split('/')[1];
     return {
-      filename: `schaden_foto_${i + 1}.${ext}`,
+      name: `schaden_foto_${i + 1}.${ext}`,
       content: data,
     };
   });
 
+  const ritaEmail = process.env.RITA_EMAIL;
+  const brevoKey = process.env.BREVO_API_KEY;
+
   try {
-    const { error } = await getResend().emails.send({
-      from: 'KFZ Schadenformular <onboarding@resend.dev>',
-      to: process.env.RITA_EMAIL,
-      replyTo: personal.email,
-      subject: `🚗 Neuer KFZ-Schaden: ${personal.vorname} ${personal.nachname} – ${fahrzeug.kennzeichen}`,
-      html: htmlBody,
-      attachments,
+    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'accept': 'application/json',
+        'api-key': brevoKey,
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        sender: { name: 'KFZ Schadenformular', email: ritaEmail },
+        to: [{ email: ritaEmail }],
+        replyTo: { email: personal.email, name: `${personal.vorname} ${personal.nachname}` },
+        subject: `🚗 Neuer KFZ-Schaden: ${personal.vorname} ${personal.nachname} – ${fahrzeug.kennzeichen}`,
+        htmlContent: htmlBody,
+        attachment: attachments,
+      }),
     });
 
-    if (error) {
-      console.error('Resend Fehler:', error);
-      return res.status(500).json({ success: false, message: 'E-Mail konnte nicht gesendet werden.', error: error.message });
+    if (!response.ok) {
+      const errData = await response.json();
+      console.error('Brevo Fehler:', errData);
+      return res.status(500).json({ success: false, message: 'E-Mail konnte nicht gesendet werden.', error: errData.message });
     }
 
     res.json({ success: true, message: 'Formular erfolgreich übermittelt.' });
