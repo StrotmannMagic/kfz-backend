@@ -1,12 +1,14 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 const rateLimit = require('express-rate-limit');
 
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
+
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const submitLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 Stunde
@@ -14,17 +16,6 @@ const submitLimiter = rateLimit({
   message: { success: false, message: 'Zu viele Anfragen. Bitte versuchen Sie es in einer Stunde erneut.' },
   standardHeaders: true,
   legacyHeaders: false,
-});
-
-// E-Mail Konfiguration - wird über .env gesetzt
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: parseInt(process.env.SMTP_PORT || '465'),
-  secure: true,
-  auth: {
-    user: process.env.SMTP_USER || '',
-    pass: process.env.SMTP_PASS || '',
-  },
 });
 
 app.post('/api/submit', submitLimiter, async (req, res) => {
@@ -99,18 +90,23 @@ app.post('/api/submit', submitLimiter, async (req, res) => {
     return {
       filename: `schaden_foto_${i + 1}.${ext}`,
       content: data,
-      encoding: 'base64',
     };
   });
 
   try {
-    await transporter.sendMail({
-      from: `"KFZ Schadenformular" <${process.env.SMTP_USER}>`,
-      to: process.env.RITA_EMAIL || process.env.SMTP_USER,
+    const { error } = await resend.emails.send({
+      from: 'KFZ Schadenformular <onboarding@resend.dev>',
+      to: process.env.RITA_EMAIL,
+      replyTo: personal.email,
       subject: `🚗 Neuer KFZ-Schaden: ${personal.vorname} ${personal.nachname} – ${fahrzeug.kennzeichen}`,
       html: htmlBody,
       attachments,
     });
+
+    if (error) {
+      console.error('Resend Fehler:', error);
+      return res.status(500).json({ success: false, message: 'E-Mail konnte nicht gesendet werden.', error: error.message });
+    }
 
     res.json({ success: true, message: 'Formular erfolgreich übermittelt.' });
   } catch (err) {
