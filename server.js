@@ -407,8 +407,72 @@ app.post('/api/submit', submitLimiter, async (req, res) => {
           to: [{ email: personal.email, name: `${personal.vorname} ${personal.nachname}` }],
           subject: isDE ? 'Generali-Vertragswerkstätten Mallorca' : 'Generali Partner Workshops Mallorca',
           htmlContent: isDE
-            ? `<p>Sehr geehrte/r ${personal.vorname} ${personal.nachname},</p><p>wie angekündigt erhalten Sie anbei die Liste der Generali-Vertragswerkstätten auf Mallorca.</p><p>Bei Fragen stehen wir Ihnen gerne zur Verfügung.</p>${SIGNATURE_DE}`
-            : `<p>Dear ${personal.vorname} ${personal.nachname},</p><p>as announced, please find attached the list of Generali partner workshops in Mallorca.</p><p>If you have any questions, please do not hesitate to contact us.</p>${SIGNATURE_EN}`,
+            ? `<div style="font-family:sans-serif;max-width:600px;margin:auto;">
+                <p>Sehr geehrte/r ${personal.vorname} ${personal.nachname},</p>
+                <p>anbei erhalten Sie die Liste der Generali-Vertragswerkstätten auf Mallorca sowie wichtige Informationen zur Schadenabwicklung.</p>
+                <hr style="border:none;border-top:2px solid #1a56db;margin:20px 0;">
+                <h3 style="color:#1a56db;">FÜR DIE REPARATUR DES FAHRZEUGES GIBT ES ZWEI MÖGLICHKEITEN</h3>
+                <h4>1) Eigene Werkstattwahl</h4>
+                <p>Wenn eine Werkstatt des eigenen Vertrauens genutzt werden soll, werden folgende Informationen benötigt:</p>
+                <ul>
+                  <li>Name der Werkstatt</li>
+                  <li>Adresse</li>
+                  <li>Telefonnummer</li>
+                  <li>Ein Tag, an dem das Fahrzeug früh morgens dort abgegeben werden kann</li>
+                </ul>
+                <p>Der Gutachtertermin wird dann organisiert.<br>
+                <strong>Bitte beachten:</strong> Der Tag kann koordiniert werden, die genaue Uhrzeit jedoch nicht. Hierfür ist eine Vorlaufzeit von mindestens 2 Werktagen erforderlich.</p>
+                <h4>2) GENERALI-Vertragswerkstatt</h4>
+                <p>Alternativ kann eine GENERALI-Vertragswerkstatt auf der Insel genutzt werden (anbei die Liste der verfügbaren Werkstätten).<br>
+                Bitte eine Werkstatt auswählen und mitteilen, damit diese im System zugewiesen werden kann und Zugriff auf die Kundendaten erhält. Anschließend kann man während der Öffnungszeiten einfach dort vorbeikommen. Bei kleineren Schäden erstellt die Werkstatt das Gutachten selbst oder kümmert sich um die weitere Organisation. Erfahrungsgemäß ist die Abwicklung auf diesem Weg schneller und effizienter.</p>
+                <hr style="border:none;border-top:1px solid #e5e7eb;margin:20px 0;">
+                <h3 style="color:#1a56db;">ANSPRUCH AUF ERSATZWAGEN</h3>
+                <p>Es besteht Anspruch auf einen Ersatzwagen:</p>
+                <p><strong>1) Bei einer GENERALI-Vertragswerkstatt:</strong><br>
+                Der Ersatzwagen wird direkt bei Fahrzeugabgabe über die Werkstatt organisiert.</p>
+                <p><strong>2) Bei eigener Werkstattwahl:</strong><br>
+                Der Ersatzwagen sollte selbst bestellt werden, sobald das Fahrzeug zur Reparatur abgegeben wurde – über die mehrsprachige Telefonnummer <strong>900 101 369</strong> oder <strong>+34 915 949 758</strong>.<br>
+                Die Versicherung benötigt dafür eine Arbeitsbestätigung („Orden de Trabajo") von der Werkstatt, aus der das Abgabedatum sowie die voraussichtliche Reparaturdauer hervorgehen. Anschließend wird eine SMS mit dem Abholort des Ersatzwagens zugeschickt.<br>
+                Sollte der Abholort (häufig der Flughafen) nicht erreichbar sein, kann über dieselbe Telefonnummer ein Taxi auf Kosten der Versicherung organisiert werden.</p>
+                <hr style="border:none;border-top:1px solid #e5e7eb;margin:20px 0;">
+                <p style="background:#fff7ed;border-left:4px solid #f97316;padding:12px;border-radius:4px;">
+                <strong>Wichtiger Hinweis:</strong> Nahezu alle Versicherungsleistungen sind Serviceleistungen, die telefonisch bei der Versicherung angefordert werden müssen. Es handelt sich nicht um eine Kostenerstattung im Nachhinein – bitte daher immer vorab organisieren.</p>
+                <p>Bei Fragen stehe ich gerne telefonisch oder per E-Mail zur Verfügung.</p>
+                ${SIGNATURE_DE}
+              </div>`
+            : `<div style="font-family:sans-serif;max-width:600px;margin:auto;">
+                <p>Dear ${personal.vorname} ${personal.nachname},</p>
+                <p>Please find attached the list of Generali partner workshops in Mallorca and important information about the claims process.</p>
+                <hr style="border:none;border-top:2px solid #1a56db;margin:20px 0;">
+                <h3 style="color:#1a56db;">THERE ARE TWO OPTIONS FOR YOUR VEHICLE REPAIR</h3>
+                <h4>1) Your own choice of workshop</h4>
+                <p>If you wish to use a workshop of your own choice, the following information is required:</p>
+                <ul>
+                  <li>Name of the workshop</li>
+                  <li>Address</li>
+                  <li>Phone number</li>
+                  <li>A day when the vehicle can be dropped off early in the morning</li>
+                </ul>
+                <p>The appraiser appointment will then be organised.<br>
+                <strong>Please note:</strong> The day can be coordinated, but not the exact time. A lead time of at least 2 working days is required.</p>
+                <h4>2) GENERALI partner workshop</h4>
+                <p>Alternatively, a GENERALI partner workshop on the island can be used (please find the list of available workshops attached).<br>
+                Please select a workshop and let us know so it can be assigned in the system and given access to your data. You can then simply visit during opening hours. For minor damage, the workshop will prepare the assessment themselves or arrange further organisation. In our experience, this process tends to be faster and more efficient.</p>
+                <hr style="border:none;border-top:1px solid #e5e7eb;margin:20px 0;">
+                <h3 style="color:#1a56db;">ENTITLEMENT TO A REPLACEMENT VEHICLE</h3>
+                <p>You are entitled to a replacement vehicle:</p>
+                <p><strong>1) At a GENERALI partner workshop:</strong><br>
+                The replacement vehicle is organised directly through the workshop when you drop off your vehicle.</p>
+                <p><strong>2) With your own choice of workshop:</strong><br>
+                The replacement vehicle should be ordered yourself once the vehicle has been dropped off for repair – via the multilingual phone number <strong>900 101 369</strong> or <strong>+34 915 949 758</strong>.<br>
+                The insurance company requires a work confirmation ("Orden de Trabajo") from the workshop, showing the drop-off date and estimated repair duration. An SMS with the pick-up location of the replacement vehicle will then be sent.<br>
+                If the pick-up location (often the airport) is not accessible, a taxi at the insurance company's expense can be arranged via the same phone number.</p>
+                <hr style="border:none;border-top:1px solid #e5e7eb;margin:20px 0;">
+                <p style="background:#fff7ed;border-left:4px solid #f97316;padding:12px;border-radius:4px;">
+                <strong>Important note:</strong> Almost all insurance services must be arranged in advance by phone with the insurance company. These are not reimbursements after the fact – please always organise in advance.</p>
+                <p>If you have any questions, please feel free to contact me by phone or email.</p>
+                ${SIGNATURE_EN}
+              </div>`,
           attachment: [{
             name: 'Generali_Vertragswerkstaetten_Mallorca.pdf',
             content: pdfBase64,
