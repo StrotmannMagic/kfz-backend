@@ -240,12 +240,12 @@ app.post('/api/submit', submitLimiter, async (req, res) => {
         body: JSON.stringify({
           sender: { name: 'Rita Last Versicherungen', email: ritaEmail },
           to: [{ email: personal.email, name: `${personal.vorname} ${personal.nachname}` }],
-          subject: isDE ? 'Liste der Vertragswerkstätten Mallorca' : 'List of Partner Workshops Mallorca',
+          subject: isDE ? 'Generali-Vertragswerkstätten Mallorca' : 'Generali Partner Workshops Mallorca',
           htmlContent: isDE
-            ? `<p>Sehr geehrte/r ${personal.vorname} ${personal.nachname},</p><p>wie angekündigt erhalten Sie anbei die Liste der Vertragswerkstätten auf Mallorca.</p><p>Bei Fragen stehen wir Ihnen gerne zur Verfügung.</p><p>Mit freundlichen Grüßen<br>Rita Last Versicherungen</p>`
-            : `<p>Dear ${personal.vorname} ${personal.nachname},</p><p>as announced, please find attached the list of partner workshops in Mallorca.</p><p>If you have any questions, please do not hesitate to contact us.</p><p>Kind regards<br>Rita Last Versicherungen</p>`,
+            ? `<p>Sehr geehrte/r ${personal.vorname} ${personal.nachname},</p><p>wie angekündigt erhalten Sie anbei die Liste der Generali-Vertragswerkstätten auf Mallorca.</p><p>Bei Fragen stehen wir Ihnen gerne zur Verfügung.</p><p>Mit freundlichen Grüßen<br>Rita Last Versicherungen</p>`
+            : `<p>Dear ${personal.vorname} ${personal.nachname},</p><p>as announced, please find attached the list of Generali partner workshops in Mallorca.</p><p>If you have any questions, please do not hesitate to contact us.</p><p>Kind regards<br>Rita Last Versicherungen</p>`,
           attachment: [{
-            name: 'Vertragswerkstaetten_Mallorca.pdf',
+            name: 'Generali_Vertragswerkstaetten_Mallorca.pdf',
             content: pdfBase64,
           }],
         }),
