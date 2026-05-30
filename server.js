@@ -18,6 +18,34 @@ const submitLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+const SIGNATURE_DE = `
+<div style="font-family:sans-serif;font-size:12px;color:#374151;margin-top:24px;border-top:1px solid #e5e7eb;padding-top:16px;">
+  <p style="margin:0;"><strong>RITA LAST Versicherung</strong><br>
+  C/ Garcilaso de Vega, s/n (Complejo 4 Illes)<br>
+  07181 Costa d'en Blanes (Balearen)<br>
+  Handy: (+34) 618 327 307 &nbsp;|&nbsp; Büro: (+34) 971 675 413<br>
+  Email: <a href="mailto:ritalastversicherung@gmail.com">ritalastversicherung@gmail.com</a></p>
+  <p style="margin:8px 0 0;">Öffnungszeiten: Montag bis Freitag von 09:00 bis 15:00 Uhr.<br>
+  In dringenden Fällen bitte eine SMS Nachricht an die Handy-Nummer schicken!</p>
+  <p style="margin:8px 0 0;color:#dc2626;"><strong>WICHTIG:</strong> Aus Datenschutz-Gründen und wegen mangelnder Übersichtlichkeit werden WhatsApp Nachrichten nicht gelesen und nicht bearbeitet!</p>
+  <hr style="border:none;border-top:1px solid #d1d5db;margin:12px 0;">
+  <p style="margin:0;font-size:10px;color:#6b7280;">RECHTLICHE HINWEIS: Diese E-Mail und, wo zutreffend, jede angehängte Datei enthält vertrauliche Informationen, die ausschließlich an den Empfänger adressiert sind. Seine Offenlegung, Kopierung oder Verbreitung an Dritte ohne vorherige schriftliche Genehmigung der Gesellschaft ist verboten. Wenn Sie diese E-Mail irrtümlich erhalten haben, löschen Sie bitte und informieren Sie den Absender sofort über dessen E-Mail-Adresse. Gemäß den Bestimmungen der Verordnung (EU) 679/2016 und des Organischen Gesetzes 3/2018 vom 5. Dezember zum Schutz personenbezogener Daten und zur Sicherung digitaler Rechte (LOPDPGDD) erhalten Sie folgende Datenschutzinformationen: Verantwortlich: RITA LAST, CIF: X3150888A, Postadresse: C/ GARCILASO DE LA VEGA, EDIF. IBIZA I 3º B, C.P.: 07181, COSTA D'EN BLANES, Telefon: 971675413, E-Mail: RITALASTVERSICHERUNG@GMAIL.COM. Die Rechtmäßigkeit der Verarbeitung Ihrer personenbezogenen Daten beruht auf einem berechtigten Interesse. Sie haben das Recht auf Zugang, Berichtigung, Löschung, Ablehnung, Einschränkung der Verarbeitung sowie das Recht auf Datenübertragbarkeit. Sie haben das Recht, eine Beschwerde bei der Aufsichtsbehörde einzureichen: der spanischen Datenschutzbehörde (<a href="https://www.agpd.es">www.agpd.es</a>).</p>
+</div>`;
+
+const SIGNATURE_EN = `
+<div style="font-family:sans-serif;font-size:12px;color:#374151;margin-top:24px;border-top:1px solid #e5e7eb;padding-top:16px;">
+  <p style="margin:0;"><strong>RITA LAST Insurance</strong><br>
+  C/ Garcilaso de la Vega, s/n (Complejo 4 Illes)<br>
+  07181 Costa d'en Blanes (Islas Baleares)<br>
+  Mobile: (+34) 618 327 307 &nbsp;|&nbsp; Office: (+34) 971 675 413<br>
+  Email: <a href="mailto:ritalastinsurance@gmail.com">ritalastinsurance@gmail.com</a></p>
+  <p style="margin:8px 0 0;">Opening hours: Monday to Friday from 09:00 till 15:00h.<br>
+  In case of an emergency, please send a SMS message to the mobile number.</p>
+  <p style="margin:8px 0 0;color:#dc2626;"><strong>IMPORTANT:</strong> Due to data protection and lack of clarity, WhatsApp messages will not be read nor attended.</p>
+  <hr style="border:none;border-top:1px solid #d1d5db;margin:12px 0;">
+  <p style="margin:0;font-size:10px;color:#6b7280;">LEGAL NOTICE: This e-mail (including any possible file attachments) contains confidential information and is exclusively destined for its addressee. It is prohibited to disclose, copy or distribute to third parties the contents of this e-mail without prior written authorization from the company. If you have received this e-mail accidentally, please delete, and return it immediately to the sender. In accordance with Regulation (EU) 679/2016 and Organic Law 3/2018 of 5 December on Personal Data Protection (LOPDPGDD): Manager: RITA LAST, CIF: X3150888A, Address: C/ GARCILASO DE LA VEGA, EDIF. IBIZA I 3º B, C.P.: 07181, COSTA D'EN BLANES, Tel: 971675413, Email: RITALASTINSURANCE@GMAIL.COM. You have the right to access, rectify, remove, oppose or limit the processing of your personal data and the right to file a complaint with the Spanish Agency for Data Protection (<a href="https://www.agpd.es">www.agpd.es</a>).</p>
+</div>`;
+
 function row(label, value) {
   if (!value) return '';
   return `<tr><td style="padding:4px 8px;font-weight:bold;white-space:nowrap;">${label}:</td><td style="padding:4px 8px;">${value}</td></tr>`;
@@ -137,6 +165,7 @@ function buildEmailHtml(formData, lang) {
     );
   }
 
+  body += isDE ? SIGNATURE_DE : SIGNATURE_EN;
   return body;
 }
 
@@ -378,8 +407,8 @@ app.post('/api/submit', submitLimiter, async (req, res) => {
           to: [{ email: personal.email, name: `${personal.vorname} ${personal.nachname}` }],
           subject: isDE ? 'Generali-Vertragswerkstätten Mallorca' : 'Generali Partner Workshops Mallorca',
           htmlContent: isDE
-            ? `<p>Sehr geehrte/r ${personal.vorname} ${personal.nachname},</p><p>wie angekündigt erhalten Sie anbei die Liste der Generali-Vertragswerkstätten auf Mallorca.</p><p>Bei Fragen stehen wir Ihnen gerne zur Verfügung.</p><p>Mit freundlichen Grüßen<br>Rita Last Versicherungen</p>`
-            : `<p>Dear ${personal.vorname} ${personal.nachname},</p><p>as announced, please find attached the list of Generali partner workshops in Mallorca.</p><p>If you have any questions, please do not hesitate to contact us.</p><p>Kind regards<br>Rita Last Versicherungen</p>`,
+            ? `<p>Sehr geehrte/r ${personal.vorname} ${personal.nachname},</p><p>wie angekündigt erhalten Sie anbei die Liste der Generali-Vertragswerkstätten auf Mallorca.</p><p>Bei Fragen stehen wir Ihnen gerne zur Verfügung.</p>${SIGNATURE_DE}`
+            : `<p>Dear ${personal.vorname} ${personal.nachname},</p><p>as announced, please find attached the list of Generali partner workshops in Mallorca.</p><p>If you have any questions, please do not hesitate to contact us.</p>${SIGNATURE_EN}`,
           attachment: [{
             name: 'Generali_Vertragswerkstaetten_Mallorca.pdf',
             content: pdfBase64,
@@ -401,8 +430,7 @@ app.post('/api/submit', submitLimiter, async (req, res) => {
             <p>vielen Dank für Ihre Schadensmeldung. Wir haben Ihre Daten erhalten und werden uns so schnell wie möglich bei Ihnen melden.</p>
             <p>Im Anhang finden Sie eine Kopie Ihrer Schadensmeldung als PDF.</p>
             <p><b>Ihre Referenz:</b> ${fahrzeug?.kennzeichen || ''} – ${new Date().toLocaleDateString('de-DE')}</p>
-            <hr style="border:none;border-top:1px solid #e5e7eb;margin:20px 0;">
-            <p style="color:#6b7280;font-size:13px;">Rita Last Versicherungen<br>ritalastversicherungen@gmail.com</p>
+            ${SIGNATURE_DE}
           </div>`
         : `<div style="font-family:sans-serif;max-width:600px;margin:auto;">
             <h2 style="color:#1a56db;">✅ Your accident claim has been received</h2>
@@ -410,8 +438,7 @@ app.post('/api/submit', submitLimiter, async (req, res) => {
             <p>Thank you for submitting your accident claim. We have received your information and will get back to you as soon as possible.</p>
             <p>Please find attached a copy of your claim report as PDF.</p>
             <p><b>Your reference:</b> ${fahrzeug?.kennzeichen || ''} – ${new Date().toLocaleDateString('en-GB')}</p>
-            <hr style="border:none;border-top:1px solid #e5e7eb;margin:20px 0;">
-            <p style="color:#6b7280;font-size:13px;">Rita Last Versicherungen<br>ritalastversicherungen@gmail.com</p>
+            ${SIGNATURE_EN}
           </div>`;
 
       await fetch('https://api.brevo.com/v3/smtp/email', {
