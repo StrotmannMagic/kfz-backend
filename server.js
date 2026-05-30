@@ -124,5 +124,15 @@ app.post('/api/submit', submitLimiter, async (req, res) => {
 
 app.get('/api/health', (_, res) => res.json({ status: 'ok' }));
 
+app.get('/api/debug-env', (_, res) => {
+  const key = process.env.BREVO_API_KEY;
+  res.json({
+    brevo_key_exists: !!key,
+    brevo_key_length: key ? key.length : 0,
+    brevo_key_start: key ? key.substring(0, 10) : null,
+    rita_email: process.env.RITA_EMAIL || null,
+  });
+});
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Backend läuft auf http://localhost:${PORT}`));
