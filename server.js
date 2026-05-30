@@ -2,24 +2,38 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const nodemailer = require('nodemailer');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 
+const submitLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 Stunde
+  max: 5,
+  message: { success: false, message: 'Zu viele Anfragen. Bitte versuchen Sie es in einer Stunde erneut.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 // E-Mail Konfiguration - wird über .env gesetzt
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: parseInt(process.env.SMTP_PORT || '587'),
-  secure: false,
+  port: parseInt(process.env.SMTP_PORT || '465'),
+  secure: true,
   auth: {
     user: process.env.SMTP_USER || '',
     pass: process.env.SMTP_PASS || '',
   },
 });
 
-app.post('/api/submit', async (req, res) => {
-  const { formData, images } = req.body;
+app.post('/api/submit', submitLimiter, async (req, res) => {
+  const { formData, images, honeypot } = req.body;
+
+  // Bot-Schutz: Honeypot-Feld muss leer sein
+  if (honeypot) {
+    return res.status(400).json({ success: false, message: 'Ungültige Anfrage.' });
+  }
 
   const {
     personal, fahrzeug, versicherung, unfall, gegner, schaden
