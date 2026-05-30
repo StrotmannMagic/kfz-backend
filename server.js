@@ -221,6 +221,37 @@ app.post('/api/submit', submitLimiter, async (req, res) => {
       return res.status(500).json({ success: false, message: 'E-Mail konnte nicht gesendet werden.', error: errData.message });
     }
 
+    // Send workshop list to customer if Generali selected
+    if (formData.eigenSchaden?.werkstatt === 'generali' && personal?.email) {
+      const fs = require('fs');
+      const path = require('path');
+      const pdfPath = path.join(__dirname, 'werkstaetten_mallorca.pdf');
+      const pdfBase64 = fs.readFileSync(pdfPath).toString('base64');
+
+      const isDE = lang !== 'en';
+
+      await fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'api-key': brevoKey,
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          sender: { name: 'Rita Last Versicherungen', email: ritaEmail },
+          to: [{ email: personal.email, name: `${personal.vorname} ${personal.nachname}` }],
+          subject: isDE ? 'Liste der Vertragswerkstätten Mallorca' : 'List of Partner Workshops Mallorca',
+          htmlContent: isDE
+            ? `<p>Sehr geehrte/r ${personal.vorname} ${personal.nachname},</p><p>wie angekündigt erhalten Sie anbei die Liste der Vertragswerkstätten auf Mallorca.</p><p>Bei Fragen stehen wir Ihnen gerne zur Verfügung.</p><p>Mit freundlichen Grüßen<br>Rita Last Versicherungen</p>`
+            : `<p>Dear ${personal.vorname} ${personal.nachname},</p><p>as announced, please find attached the list of partner workshops in Mallorca.</p><p>If you have any questions, please do not hesitate to contact us.</p><p>Kind regards<br>Rita Last Versicherungen</p>`,
+          attachment: [{
+            name: 'Vertragswerkstaetten_Mallorca.pdf',
+            content: pdfBase64,
+          }],
+        }),
+      });
+    }
+
     res.json({ success: true, message: 'Formular erfolgreich übermittelt.' });
   } catch (err) {
     console.error('E-Mail Fehler:', err);
