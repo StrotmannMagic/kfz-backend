@@ -105,7 +105,7 @@ app.post('/api/submit', submitLimiter, async (req, res) => {
         replyTo: { email: personal.email, name: `${personal.vorname} ${personal.nachname}` },
         subject: `🚗 Neuer KFZ-Schaden: ${personal.vorname} ${personal.nachname} – ${fahrzeug.kennzeichen}`,
         htmlContent: htmlBody,
-        attachment: attachments,
+        ...(attachments.length > 0 && { attachment: attachments }),
       }),
     });
 
@@ -124,17 +124,6 @@ app.post('/api/submit', submitLimiter, async (req, res) => {
 
 app.get('/api/health', (_, res) => res.json({ status: 'ok' }));
 
-app.get('/api/debug-env', (_, res) => {
-  const key = process.env.BREVO_API_KEY;
-  const allKeys = Object.keys(process.env).filter(k => !k.includes('SECRET') && !k.includes('TOKEN') && !k.includes('PASS'));
-  res.json({
-    brevo_key_exists: !!key,
-    brevo_key_length: key ? key.length : 0,
-    brevo_key_start: key ? key.substring(0, 10) : null,
-    rita_email: process.env.RITA_EMAIL || null,
-    all_env_keys: allKeys,
-  });
-});
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Backend läuft auf http://localhost:${PORT}`));
