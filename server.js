@@ -80,7 +80,8 @@ function buildEmailHtml(formData, lang) {
     row('Name', `${personal?.vorname || ''} ${personal?.nachname || ''}`.trim()) +
     row('E-Mail', personal?.email) +
     row('Telefon', personal?.telefon) +
-    row('Adresse', [personal?.strasse, personal?.plz, personal?.ort].filter(Boolean).join(', '))
+    row('Adresse', [personal?.strasse, personal?.plz, personal?.ort].filter(Boolean).join(', ')) +
+    row(isDE ? 'Policenummer' : 'Policy Number', personal?.police_nr)
   );
 
   // Fahrzeug
@@ -386,8 +387,10 @@ app.post('/api/submit', submitLimiter, async (req, res) => {
       return res.status(500).json({ success: false, message: 'E-Mail konnte nicht gesendet werden.', error: errData.message });
     }
 
-    // Send workshop list to customer if Generali selected
-    if (formData.eigenSchaden?.werkstatt === 'generali' && personal?.email) {
+    // Send workshop list to customer if Generali selected (Unfall or Scheibenschaden)
+    const generaliSelected = formData.eigenSchaden?.werkstatt === 'generali' ||
+      (formData.schadensart === 'scheibe' && formData.scheibe?.reparatur === 'generali');
+    if (generaliSelected && personal?.email) {
       const fs = require('fs');
       const path = require('path');
       const pdfPath = path.join(__dirname, 'werkstaetten_mallorca.pdf');
