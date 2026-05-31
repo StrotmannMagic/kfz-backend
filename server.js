@@ -94,6 +94,7 @@ function buildEmailHtml(formData, lang) {
   if (schadensart === 'scheibe') {
     body += section('Scheibenschaden / Glass Damage', '🪟',
       row('Reparatur / Repair', scheibe?.reparatur) +
+      row(isDE ? 'Schadendatum' : 'Date of Damage', scheibe?.datum) +
       row('Beschreibung / Description', scheibe?.beschreibung)
     );
   }
