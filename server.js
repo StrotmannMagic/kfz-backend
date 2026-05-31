@@ -533,6 +533,90 @@ app.post('/api/submit', submitLimiter, async (req, res) => {
   }
 });
 
+// ─── Hogar Angebotsanfrage ───────────────────────────────────────────────────
+app.post('/api/hogar-anfrage', submitLimiter, async (req, res) => {
+  const { formData, honeypot } = req.body;
+  if (honeypot) return res.status(400).json({ success: false, message: 'Ungültige Anfrage.' });
+
+  const ritaEmail = process.env.RITA_EMAIL;
+  const brevoKey = process.env.BREVO_API_KEY;
+  const { personal, objekt, ausstattung, schaden, tarif, nachricht } = formData;
+
+  const r = (label, value) => value ? `<tr><td style="padding:4px 8px;font-weight:bold;white-space:nowrap;">${label}:</td><td style="padding:4px 8px;">${value}</td></tr>` : '';
+  const sec = (title, rows) => `<h3 style="color:#cc0000;margin-top:20px;">🏠 ${title}</h3><table border="0" cellpadding="0" style="font-family:sans-serif;font-size:14px;">${rows}</table>`;
+
+  const htmlBody = `
+    <h2 style="color:#cc0000;">🏠 Neue Hogar-Angebotsanfrage</h2>
+    ${sec('Persönliche Daten',
+      r('Name', `${personal?.vorname || ''} ${personal?.nachname || ''}`.trim()) +
+      r('E-Mail', personal?.email) + r('Telefon', personal?.telefon) +
+      r('Geburtsdatum', personal?.geburtsdatum) + r('Nationalität', personal?.nationalitaet)
+    )}
+    ${sec('Die Immobilie',
+      r('Adresse', [objekt?.strasse, objekt?.etage, objekt?.plz, objekt?.ort].filter(Boolean).join(', ')) +
+      r('Immobilienart', objekt?.immobilienart) + r('Eigentümer/Mieter', objekt?.eigentuemer) +
+      r('Nutzung', objekt?.nutzung) + r('Baujahr', objekt?.baujahr) +
+      r('Wohnfläche', objekt?.wohnflaeche ? `${objekt.wohnflaeche} m²` : '') +
+      r('Zimmer', objekt?.zimmer) + r('Stockwerk', objekt?.stockwerk) +
+      r('Gebäudewert (Continente)', objekt?.gebaeudewert ? `${objekt.gebaeudewert} €` : '') +
+      r('Inhaltswert (Contenido)', objekt?.inhaltswert ? `${objekt.inhaltswert} €` : '')
+    )}
+    ${sec('Ausstattung', r('Extras', Array.isArray(ausstattung?.extras) && ausstattung.extras.length > 0 ? ausstattung.extras.join(', ') : 'Keine'))}
+    ${sec('Schadenshistorie',
+      r('Vorschäden letzte 3 Jahre?', schaden?.vorschaeden) +
+      (schaden?.vorschaeden === 'ja' ? r('Details Vorschäden', schaden?.vorschaeden_details) : '') +
+      r('Bestehende Versicherung?', schaden?.bestehende_versicherung) +
+      r('Gewünschter Beginn', schaden?.versicherungsbeginn)
+    )}
+    ${tarif?.wunsch ? sec('Tarif-Wunsch', r('Präferenz', tarif.wunsch)) : ''}
+    ${nachricht?.text ? sec('Nachricht', r('Text', nachricht.text)) : ''}
+    ${SIGNATURE_DE}
+  `;
+
+  try {
+    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: { 'accept': 'application/json', 'api-key': brevoKey, 'content-type': 'application/json' },
+      body: JSON.stringify({
+        sender: { name: 'Hogar Angebotsformular', email: ritaEmail },
+        to: [{ email: ritaEmail }],
+        replyTo: { email: personal?.email || ritaEmail, name: `${personal?.vorname || ''} ${personal?.nachname || ''}`.trim() },
+        subject: `🏠 Hogar-Anfrage: ${personal?.vorname || ''} ${personal?.nachname || ''} – ${objekt?.ort || ''}`.trim(),
+        htmlContent: htmlBody,
+      }),
+    });
+
+    if (!response.ok) {
+      const errData = await response.json();
+      return res.status(500).json({ success: false, message: 'E-Mail konnte nicht gesendet werden.', error: errData.message });
+    }
+
+    // Bestätigungsmail an Kunden
+    if (personal?.email) {
+      await fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: { 'accept': 'application/json', 'api-key': brevoKey, 'content-type': 'application/json' },
+        body: JSON.stringify({
+          sender: { name: 'Rita Last Versicherungen', email: ritaEmail },
+          to: [{ email: personal.email, name: `${personal.vorname} ${personal.nachname}` }],
+          subject: 'Ihre Hogar-Angebotsanfrage ist eingegangen',
+          htmlContent: `<div style="font-family:sans-serif;max-width:600px;margin:auto;">
+            <h2 style="color:#cc0000;">✅ Ihre Angebotsanfrage ist eingegangen</h2>
+            <p>Sehr geehrte/r ${personal.vorname} ${personal.nachname},</p>
+            <p>vielen Dank für Ihre Anfrage zur Hogar-Versicherung. Rita meldet sich innerhalb von 24 Stunden bei Ihnen.</p>
+            ${SIGNATURE_DE}
+          </div>`,
+        }),
+      });
+    }
+
+    res.json({ success: true, message: 'Anfrage erfolgreich übermittelt.' });
+  } catch (err) {
+    console.error('Hogar Fehler:', err);
+    res.status(500).json({ success: false, message: 'E-Mail konnte nicht gesendet werden.', error: err.message });
+  }
+});
+
 app.get('/api/health', (_, res) => res.json({ status: 'ok' }));
 
 const PORT = process.env.PORT || 3001;
