@@ -373,7 +373,7 @@ app.post('/api/submit', submitLimiter, async (req, res) => {
         'content-type': 'application/json',
       },
       body: JSON.stringify({
-        sender: { name: 'KFZ Schadenformular', email: ritaEmail },
+        sender: { name: 'Rita Last Versicherungen', email: 'rita@rita-last.com' },
         to: [{ email: ritaEmail }],
         replyTo: { email: personal?.email || ritaEmail, name: `${personal?.vorname || ''} ${personal?.nachname || ''}`.trim() },
         subject,
@@ -407,7 +407,7 @@ app.post('/api/submit', submitLimiter, async (req, res) => {
           'content-type': 'application/json',
         },
         body: JSON.stringify({
-          sender: { name: 'Rita Last Versicherungen', email: ritaEmail },
+          sender: { name: 'Rita Last Versicherungen', email: 'rita@rita-last.com' },
           to: [{ email: personal.email, name: `${personal.vorname} ${personal.nachname}` }],
           subject: isDE ? 'Generali-Vertragswerkstätten Mallorca' : 'Generali Partner Workshops Mallorca',
           htmlContent: isDE
@@ -517,7 +517,7 @@ app.post('/api/submit', submitLimiter, async (req, res) => {
           'content-type': 'application/json',
         },
         body: JSON.stringify({
-          sender: { name: 'Rita Last Versicherungen', email: ritaEmail },
+          sender: { name: 'Rita Last Versicherungen', email: 'rita@rita-last.com' },
           to: [{ email: personal.email, name: `${personal.vorname} ${personal.nachname}` }],
           subject: customerSubject,
           htmlContent: customerHtml,
@@ -594,7 +594,7 @@ app.post('/api/hogar-anfrage', submitLimiter, async (req, res) => {
       method: 'POST',
       headers: { 'accept': 'application/json', 'api-key': brevoKey, 'content-type': 'application/json' },
       body: JSON.stringify({
-        sender: { name: 'Hogar Angebotsformular', email: ritaEmail },
+        sender: { name: 'Rita Last Versicherungen', email: 'rita@rita-last.com' },
         to: [{ email: ritaEmail }],
         replyTo: { email: personal?.email || ritaEmail, name: `${personal?.vorname || ''} ${personal?.nachname || ''}`.trim() },
         subject: `🏠 Hogar-Anfrage: ${personal?.vorname || ''} ${personal?.nachname || ''} – ${objekt?.ort || ''}`.trim(),
@@ -613,7 +613,7 @@ app.post('/api/hogar-anfrage', submitLimiter, async (req, res) => {
         method: 'POST',
         headers: { 'accept': 'application/json', 'api-key': brevoKey, 'content-type': 'application/json' },
         body: JSON.stringify({
-          sender: { name: 'Rita Last Versicherungen', email: ritaEmail },
+          sender: { name: 'Rita Last Versicherungen', email: 'rita@rita-last.com' },
           to: [{ email: personal.email, name: `${personal.vorname} ${personal.nachname}` }],
           subject: 'Ihre Hogar-Angebotsanfrage ist eingegangen',
           htmlContent: `<div style="font-family:sans-serif;max-width:600px;margin:auto;">
