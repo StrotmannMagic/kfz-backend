@@ -54,7 +54,7 @@ function row(label, value) {
 function section(title, icon, rows) {
   if (!rows) return '';
   return `
-    <h3 style="color:#1a56db;margin-top:24px;">${icon} ${title}</h3>
+    <h3 style="color:#9B2035;margin-top:24px;">${icon} ${title}</h3>
     <table border="0" cellpadding="0" style="font-family:sans-serif;font-size:14px;">${rows}</table>
   `;
 }
@@ -71,7 +71,7 @@ function buildEmailHtml(formData, lang) {
   };
 
   let body = `
-    <h2 style="color:#1a56db;">🚗 Neuer KFZ-Schadensfall – ${schadensartLabels[schadensart] || schadensart}</h2>
+    <h2 style="color:#9B2035;">🚗 Neuer KFZ-Schadensfall – ${schadensartLabels[schadensart] || schadensart}</h2>
     <p style="font-family:sans-serif;">Sprache / Language: <b>${isDE ? 'Deutsch' : 'English'}</b></p>
   `;
 
@@ -196,7 +196,7 @@ function generatePDF(formData, lang) {
 
     const heading = (title) => {
       doc.moveDown(0.5)
-         .fontSize(13).font('Helvetica-Bold').fillColor('#1a56db').text(title)
+         .fontSize(13).font('Helvetica-Bold').fillColor('#9B2035').text(title)
          .fillColor('#000000').moveDown(0.3);
     };
 
@@ -415,7 +415,7 @@ app.post('/api/submit', submitLimiter, async (req, res) => {
                 <p>Sehr geehrte/r ${personal.vorname} ${personal.nachname},</p>
                 <p>anbei erhalten Sie die Liste der Generali-Vertragswerkstätten auf Mallorca sowie wichtige Informationen zur Schadenabwicklung.</p>
                 <hr style="border:none;border-top:2px solid #1a56db;margin:20px 0;">
-                <h3 style="color:#1a56db;">FÜR DIE REPARATUR DES FAHRZEUGES GIBT ES ZWEI MÖGLICHKEITEN</h3>
+                <h3 style="color:#9B2035;">FÜR DIE REPARATUR DES FAHRZEUGES GIBT ES ZWEI MÖGLICHKEITEN</h3>
                 <h4>1) Eigene Werkstattwahl</h4>
                 <p>Wenn eine Werkstatt des eigenen Vertrauens genutzt werden soll, werden folgende Informationen benötigt:</p>
                 <ul>
@@ -430,7 +430,7 @@ app.post('/api/submit', submitLimiter, async (req, res) => {
                 <p>Alternativ kann eine GENERALI-Vertragswerkstatt auf der Insel genutzt werden (anbei die Liste der verfügbaren Werkstätten).<br>
                 Bitte eine Werkstatt auswählen und mitteilen, damit diese im System zugewiesen werden kann und Zugriff auf die Kundendaten erhält. Anschließend kann man während der Öffnungszeiten einfach dort vorbeikommen. Bei kleineren Schäden erstellt die Werkstatt das Gutachten selbst oder kümmert sich um die weitere Organisation. Erfahrungsgemäß ist die Abwicklung auf diesem Weg schneller und effizienter.</p>
                 <hr style="border:none;border-top:1px solid #e5e7eb;margin:20px 0;">
-                <h3 style="color:#1a56db;">ANSPRUCH AUF ERSATZWAGEN</h3>
+                <h3 style="color:#9B2035;">ANSPRUCH AUF ERSATZWAGEN</h3>
                 <p>Es besteht Anspruch auf einen Ersatzwagen:</p>
                 <p><strong>1) Bei einer GENERALI-Vertragswerkstatt:</strong><br>
                 Der Ersatzwagen wird direkt bei Fahrzeugabgabe über die Werkstatt organisiert.</p>
@@ -448,7 +448,7 @@ app.post('/api/submit', submitLimiter, async (req, res) => {
                 <p>Dear ${personal.vorname} ${personal.nachname},</p>
                 <p>Please find attached the list of Generali partner workshops in Mallorca and important information about the claims process.</p>
                 <hr style="border:none;border-top:2px solid #1a56db;margin:20px 0;">
-                <h3 style="color:#1a56db;">THERE ARE TWO OPTIONS FOR YOUR VEHICLE REPAIR</h3>
+                <h3 style="color:#9B2035;">THERE ARE TWO OPTIONS FOR YOUR VEHICLE REPAIR</h3>
                 <h4>1) Your own choice of workshop</h4>
                 <p>If you wish to use a workshop of your own choice, the following information is required:</p>
                 <ul>
@@ -463,7 +463,7 @@ app.post('/api/submit', submitLimiter, async (req, res) => {
                 <p>Alternatively, a GENERALI partner workshop on the island can be used (please find the list of available workshops attached).<br>
                 Please select a workshop and let us know so it can be assigned in the system and given access to your data. You can then simply visit during opening hours. For minor damage, the workshop will prepare the assessment themselves or arrange further organisation. In our experience, this process tends to be faster and more efficient.</p>
                 <hr style="border:none;border-top:1px solid #e5e7eb;margin:20px 0;">
-                <h3 style="color:#1a56db;">ENTITLEMENT TO A REPLACEMENT VEHICLE</h3>
+                <h3 style="color:#9B2035;">ENTITLEMENT TO A REPLACEMENT VEHICLE</h3>
                 <p>You are entitled to a replacement vehicle:</p>
                 <p><strong>1) At a GENERALI partner workshop:</strong><br>
                 The replacement vehicle is organised directly through the workshop when you drop off your vehicle.</p>
@@ -493,7 +493,7 @@ app.post('/api/submit', submitLimiter, async (req, res) => {
 
       const customerHtml = isDE
         ? `<div style="font-family:sans-serif;max-width:600px;margin:auto;">
-            <h2 style="color:#1a56db;">✅ Ihre Schadensmeldung ist eingegangen</h2>
+            <h2 style="color:#9B2035;">✅ Ihre Schadensmeldung ist eingegangen</h2>
             <p>Sehr geehrte/r ${personal.vorname} ${personal.nachname},</p>
             <p>vielen Dank für Ihre Schadensmeldung. Wir haben Ihre Daten erhalten und werden uns so schnell wie möglich bei Ihnen melden.</p>
             <p>Im Anhang finden Sie eine Kopie Ihrer Schadensmeldung als PDF.</p>
@@ -501,7 +501,7 @@ app.post('/api/submit', submitLimiter, async (req, res) => {
             ${SIGNATURE_DE}
           </div>`
         : `<div style="font-family:sans-serif;max-width:600px;margin:auto;">
-            <h2 style="color:#1a56db;">✅ Your accident claim has been received</h2>
+            <h2 style="color:#9B2035;">✅ Your accident claim has been received</h2>
             <p>Dear ${personal.vorname} ${personal.nachname},</p>
             <p>Thank you for submitting your accident claim. We have received your information and will get back to you as soon as possible.</p>
             <p>Please find attached a copy of your claim report as PDF.</p>
@@ -543,7 +543,7 @@ app.post('/api/hogar-anfrage', submitLimiter, async (req, res) => {
   const { personal, adresse, objekt, nutzung, flaechen, werte } = formData;
 
   const r = (label, value) => value ? `<tr><td style="padding:4px 8px;font-weight:bold;white-space:nowrap;">${label}:</td><td style="padding:4px 8px;">${value}</td></tr>` : '';
-  const sec = (title, rows) => `<h3 style="color:#cc0000;margin-top:20px;">🏠 ${title}</h3><table border="0" cellpadding="0" style="font-family:sans-serif;font-size:14px;">${rows}</table>`;
+  const sec = (title, rows) => `<h3 style="color:#9B2035;margin-top:20px;">🏠 ${title}</h3><table border="0" cellpadding="0" style="font-family:sans-serif;font-size:14px;">${rows}</table>`;
 
   const objektTyp = objekt?.typ === 'wohnung'
     ? `Wohnung (${objekt?.wohnung_lage || ''})`
@@ -558,7 +558,7 @@ app.post('/api/hogar-anfrage', submitLimiter, async (req, res) => {
     : '';
 
   const htmlBody = `
-    <h2 style="color:#cc0000;">🏠 Neue Hausversicherung-Anfrage</h2>
+    <h2 style="color:#9B2035;">🏠 Neue Hausversicherung-Anfrage</h2>
     ${sec('Versicherungsnehmer',
       r('Name', `${personal?.vorname || ''} ${personal?.nachname || ''}`.trim()) +
       r('NIE-Nummer', personal?.nie) +
@@ -617,7 +617,7 @@ app.post('/api/hogar-anfrage', submitLimiter, async (req, res) => {
           to: [{ email: personal.email, name: `${personal.vorname} ${personal.nachname}` }],
           subject: 'Ihre Hogar-Angebotsanfrage ist eingegangen',
           htmlContent: `<div style="font-family:sans-serif;max-width:600px;margin:auto;">
-            <h2 style="color:#cc0000;">✅ Ihre Angebotsanfrage ist eingegangen</h2>
+            <h2 style="color:#9B2035;">✅ Ihre Angebotsanfrage ist eingegangen</h2>
             <p>Sehr geehrte/r ${personal.vorname} ${personal.nachname},</p>
             <p>vielen Dank für Ihre Anfrage zur Hogar-Versicherung. Rita meldet sich innerhalb von 24 Stunden bei Ihnen.</p>
             ${SIGNATURE_DE}
