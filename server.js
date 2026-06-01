@@ -123,7 +123,11 @@ function buildEmailHtml(formData, lang) {
     body += section('Schäden am eigenen Fahrzeug / Own Vehicle Damage', '🔧',
       row('Beschreibung / Description', eigenSchaden?.beschreibung) +
       row('Werkstatt / Workshop', eigenSchaden?.werkstatt) +
-      row('Werkstattdaten / Workshop details', eigenSchaden?.werkstatt_daten) +
+      (eigenSchaden?.werkstatt === 'eigen' ? (
+        row('Name der Werkstatt', eigenSchaden?.werkstatt_name) +
+        row('Telefon Werkstatt', eigenSchaden?.werkstatt_tel) +
+        row('Adresse Werkstatt', [eigenSchaden?.werkstatt_strasse, eigenSchaden?.werkstatt_plz, eigenSchaden?.werkstatt_ort].filter(Boolean).join(', '))
+      ) : '') +
       row('Gutachter Termin / Appraiser date', eigenSchaden?.gutachter_termin) +
       row('Fotos / Photos', eigenSchaden?.bilder?.length > 0 ? `${eigenSchaden.bilder.length} Foto(s) angehängt` : '—')
     );
