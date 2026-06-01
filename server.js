@@ -540,36 +540,52 @@ app.post('/api/hogar-anfrage', submitLimiter, async (req, res) => {
 
   const ritaEmail = process.env.RITA_EMAIL;
   const brevoKey = process.env.BREVO_API_KEY;
-  const { personal, objekt, ausstattung, schaden, tarif, nachricht } = formData;
+  const { personal, adresse, objekt, nutzung, flaechen, werte } = formData;
 
   const r = (label, value) => value ? `<tr><td style="padding:4px 8px;font-weight:bold;white-space:nowrap;">${label}:</td><td style="padding:4px 8px;">${value}</td></tr>` : '';
   const sec = (title, rows) => `<h3 style="color:#cc0000;margin-top:20px;">🏠 ${title}</h3><table border="0" cellpadding="0" style="font-family:sans-serif;font-size:14px;">${rows}</table>`;
 
+  const objektTyp = objekt?.typ === 'wohnung'
+    ? `Wohnung (${objekt?.wohnung_lage || ''})`
+    : objekt?.typ === 'haus'
+    ? `Haus (${objekt?.haus_art === 'reihenhaus' ? 'Reihenhaus' : 'Alleinstehendes Haus'})`
+    : '';
+
+  const nutzungText = nutzung?.art === 'eigennutzung'
+    ? `Eigennutzung – ${nutzung?.eigennutzung_typ === 'hauptwohnsitz' ? 'Hauptwohnsitz' : 'Nebenwohnsitz'}`
+    : nutzung?.art === 'vermietet'
+    ? `Vermietet – ${nutzung?.vermietung_typ || ''}`
+    : '';
+
   const htmlBody = `
-    <h2 style="color:#cc0000;">🏠 Neue Hogar-Angebotsanfrage</h2>
-    ${sec('Persönliche Daten',
+    <h2 style="color:#cc0000;">🏠 Neue Hausversicherung-Anfrage</h2>
+    ${sec('Versicherungsnehmer',
       r('Name', `${personal?.vorname || ''} ${personal?.nachname || ''}`.trim()) +
-      r('E-Mail', personal?.email) + r('Telefon', personal?.telefon) +
-      r('Geburtsdatum', personal?.geburtsdatum) + r('Nationalität', personal?.nationalitaet)
+      r('NIE-Nummer', personal?.nie) +
+      r('Geburtsdatum', personal?.geburtsdatum) +
+      r('E-Mail', personal?.email)
     )}
-    ${sec('Die Immobilie',
-      r('Adresse', [objekt?.strasse, objekt?.etage, objekt?.plz, objekt?.ort].filter(Boolean).join(', ')) +
-      r('Immobilienart', objekt?.immobilienart) + r('Eigentümer/Mieter', objekt?.eigentuemer) +
-      r('Nutzung', objekt?.nutzung) + r('Baujahr', objekt?.baujahr) +
-      r('Wohnfläche', objekt?.wohnflaeche ? `${objekt.wohnflaeche} m²` : '') +
-      r('Zimmer', objekt?.zimmer) + r('Stockwerk', objekt?.stockwerk) +
-      r('Gebäudewert (Continente)', objekt?.gebaeudewert ? `${objekt.gebaeudewert} €` : '') +
-      r('Inhaltswert (Contenido)', objekt?.inhaltswert ? `${objekt.inhaltswert} €` : '')
+    ${sec('Adresse der Immobilie',
+      r('Straße', adresse?.strasse) +
+      r('PLZ / Ort', [adresse?.plz, adresse?.ort].filter(Boolean).join(' '))
     )}
-    ${sec('Ausstattung', r('Extras', Array.isArray(ausstattung?.extras) && ausstattung.extras.length > 0 ? ausstattung.extras.join(', ') : 'Keine'))}
-    ${sec('Schadenshistorie',
-      r('Vorschäden letzte 3 Jahre?', schaden?.vorschaeden) +
-      (schaden?.vorschaeden === 'ja' ? r('Details Vorschäden', schaden?.vorschaeden_details) : '') +
-      r('Bestehende Versicherung?', schaden?.bestehende_versicherung) +
-      r('Gewünschter Beginn', schaden?.versicherungsbeginn)
+    ${sec('Objekt-Details',
+      r('Art', objektTyp) +
+      r('Baujahr', objekt?.baujahr) +
+      r('Komplett saniert?', objekt?.saniert) +
+      (objekt?.saniert === 'ja' ? r('Jahr der Sanierung', objekt?.saniert_jahr) : '') +
+      r('Kataster-Nummer', objekt?.kataster)
     )}
-    ${tarif?.wunsch ? sec('Tarif-Wunsch', r('Präferenz', tarif.wunsch)) : ''}
-    ${nachricht?.text ? sec('Nachricht', r('Text', nachricht.text)) : ''}
+    ${sec('Nutzung & Flächen',
+      r('Nutzung', nutzungText) +
+      r('Bebaute Fläche', flaechen?.bebaute_flaeche ? `${flaechen.bebaute_flaeche} m²` : '') +
+      r('Weitere Nutzflächen', flaechen?.weitere_flaechen)
+    )}
+    ${sec('Versicherungswerte',
+      r('Wiederaufbauwert Gebäude', werte?.wiederaufbauwert ? `${werte.wiederaufbauwert} €` : '') +
+      r('Wiederbeschaffungswert Hausrat', werte?.wiederbeschaffungswert ? `${werte.wiederbeschaffungswert} €` : '') +
+      r('Wertgegenstände', werte?.wertgegenstaende)
+    )}
     ${SIGNATURE_DE}
   `;
 
